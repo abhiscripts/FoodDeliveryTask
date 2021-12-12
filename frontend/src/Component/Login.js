@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import "../ComponentStyles/Login.css";
-import {update_auth} from "../Redux/Actions/UserAction"
-
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPass] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const loginUser = async (event) => {
     event.preventDefault();
@@ -27,9 +23,8 @@ export default function Login() {
     });
     const data = await response.json();
     console.log("login data", data);
-    if (data.status != "fail") {
+    if (data.status !== "fail") {
       localStorage.setItem("token", data.token);
-      dispatch(update_auth(true));
       navigate("/userhome");
     } else {
       //alert("Please check your username and password");

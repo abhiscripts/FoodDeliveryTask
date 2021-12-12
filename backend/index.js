@@ -38,10 +38,10 @@ connection.once("open", () => {
 
 const usersRouter = require("./routes/users.route");
 app.use("/apis/userdatas", usersRouter);
-
-app.get("/hello", (req, res) => {
-  res.send("hey abhi");
-});
+const adminsRouter = require("./routes/admins.route");
+app.use("/apis/admindatas", adminsRouter);
+const resRouter = require("./routes/restaurant.route");
+app.use("/apis/resdatas", resRouter);
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);

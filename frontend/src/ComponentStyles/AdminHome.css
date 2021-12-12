@@ -1,0 +1,25 @@
+
+
+.adminHome {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 5px 5px 5px;
+}
+
+.basicInfo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 5px 5px 5px;
+}
+
+.dishInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 5px 5px 5px;
+}

@@ -12,7 +12,7 @@ export default function Login() {
   const loginUser = async (event) => {
     event.preventDefault();
     const response = await fetch(
-      "http://localhost:3001/apis/userdatas/adminlogin",
+      "http://localhost:3001/apis/admindatas/adminlogin",
       {
         method: "POST",
         headers: {
@@ -26,9 +26,8 @@ export default function Login() {
     );
     const data = await response.json();
     console.log(data);
-    if (data) {
-      //localStorage.setItem("token", data.token);
-      alert("Admin Login successful");
+    if (data.status !== "fail") {
+      localStorage.setItem("token", data.token);
       navigate("/adminhome");
     } else {
       alert("Please check your username and password");
