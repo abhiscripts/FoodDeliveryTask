@@ -1,0 +1,35 @@
+.resInfo {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 5px;
+    margin: 5px;
+}
+
+.dishInfo {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+    background-color: rgb(255, 247, 224);
+}
+
+.itemStyle {
+    padding: 5px;
+    margin: 5px;
+}
+
+.dataOptions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 5px;
+    margin: 5px;
+}
+
+.userPage {
+}

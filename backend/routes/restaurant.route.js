@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 //const bcrypt = require("bcrypt");
-let AdminData = require("../models/admin.model");
+//let AdminData = require("../models/admin.model");
 let RestaurantData = require("../models/restaurant.model");
 //const auth = require("../middleware/auth");
 
@@ -34,5 +34,11 @@ router.route("/addResData").post(async (req, resp) => {
     resp.status(400).json({ status: "fail", error: e.message });
   }
 });
+
+router.route("/getResData").get((req, res) => {
+    RestaurantData.find()
+      .then((users) => res.json(users))
+      .catch((err) => res.status(400).json("Error: " + err));
+  });
 
 module.exports = router;
