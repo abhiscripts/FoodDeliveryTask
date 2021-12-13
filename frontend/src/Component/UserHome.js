@@ -2,22 +2,26 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-//import jwt from "jsonwebtoken";
 import { useNavigate } from "react-router-dom";
 import { update_auth } from "../Redux/Actions/UserAction";
 import Button from "@mui/material/Button";
 import Filter from "./Filter";
+import Cart from "./Cart";
 import "../ComponentStyles/UserHome.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [resData, setResData] = useState([]);
-  const [cartData, setCartData] = useState([]);
-  const [testData, setTestData] = useState([]);
   const [filterInfo, setFilterInfo] = useState({});
-  const [filterName, setFilterName] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState({
+    name: [],
+    place: [],
+    cuisine: [],
+  });
   const [filterVisible, setFilterVisible] = useState(false);
+  const [cartVisible, setCartVisible] = useState(false);
+  const [cartData, setCartData] = useState([]);
   const dispatch = useDispatch();
 
   const populateUserData = async (token) => {
@@ -55,13 +59,13 @@ const Dashboard = () => {
       cuisineSet: Array.from(cuisineSet),
     });
   };
-  console.log("finfo", filterInfo);
+
   const getResData = async () => {
     const req = await fetch("http://localhost:3001/apis/resdatas/getResData");
     const resp = await req.json();
     setResData(resp);
     setUniqResInfo(resp);
-    console.log("populated data", resp);
+    setCartData([]);
   };
 
   useEffect(() => {
@@ -70,23 +74,99 @@ const Dashboard = () => {
     getResData();
   }, []);
 
-  useEffect(() => {
-    // let nameFilteredData = resData.reduce((acc, res) => {
-    //   if (filterName.includes(res.resName)) {
-    //     acc.push(res);
-    //   }
-    //   return acc;
-    // }, []);
+  const sortByPrice = () => {
+    resData.forEach((res) => {
+      res.resDishes.sort(
+        (a, b) => parseFloat(a.dishCost) - parseFloat(b.dishCost)
+      );
+    });
+    setResData([...resData]);
+  };
 
-    //let nameFilteredData = [];
-    // filterName.forEach((name) => {
-    //   const matchedObj = resData.filter((res) => res.resName === name);
-    //   console.log("m  effect", matchedObj);
-    //   nameFilteredData.push(matchedObj);
-    // });
-    // nameFilteredData.length && setResData(nameFilteredData);
-    // console.log("effect", filterName, "--", nameFilteredData, resData);
-  }, [filterName]);
+  const handleNameFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedFilter({
+        ...selectedFilter,
+        name: [...selectedFilter.name, event.target.id],
+      });
+    } else {
+      const updatedNames = selectedFilter.name.filter(
+        (item) => item !== event.target.id
+      );
+      setSelectedFilter({ ...selectedFilter, name: updatedNames });
+    }
+  };
+  const handlePlaceFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedFilter({
+        ...selectedFilter,
+        place: [...selectedFilter.place, event.target.id],
+      });
+    } else {
+      const updatedPlace = selectedFilter.place.filter(
+        (item) => item !== event.target.id
+      );
+      setSelectedFilter({ ...selectedFilter, place: updatedPlace });
+    }
+  };
+  const handleCFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedFilter({
+        ...selectedFilter,
+        cuisine: [...selectedFilter.cuisine, event.target.id],
+      });
+    } else {
+      const updatedCuisine = selectedFilter.cuisine.filter(
+        (item) => item !== event.target.id
+      );
+      setSelectedFilter({ ...selectedFilter, cuisine: updatedCuisine });
+    }
+  };
+
+  const filterCloseHandler = () => {
+    setFilterVisible(false);
+  };
+
+  const cartCloseHandler = () => {
+    setCartVisible(false);
+  };
+
+  const handleFilter = () => {
+    let filteredResData = [];
+    if (selectedFilter.name.length) {
+      filteredResData = resData.filter((res) =>
+        selectedFilter.name.includes(res.resName)
+      );
+    }
+    if (selectedFilter.place.length) {
+      if (filteredResData.length) {
+        filteredResData = filteredResData.filter((res) =>
+          selectedFilter.place.includes(res.resPlace)
+        );
+      } else {
+        filteredResData = resData.filter((res) =>
+          selectedFilter.place.includes(res.resPlace)
+        );
+      }
+    }
+    if (selectedFilter.cuisine.length) {
+      if (filteredResData.length) {
+        filteredResData = filteredResData.filter((res) =>
+          selectedFilter.cuisine.includes(res.resDishes[0].dishCuisine)
+        );
+      } else {
+        filteredResData = resData.filter((res) =>
+          selectedFilter.cuisine.includes(res.resDishes[0].dishCuisine)
+        );
+      }
+    }
+    setResData([...filteredResData]);
+    setFilterVisible(false);
+  };
+
+  const handleCartData = (event) => {
+    setCartData([...cartData, JSON.parse(event.target.id)]);
+  };
 
   const renderResData = () => {
     const resComponent =
@@ -104,7 +184,12 @@ const Dashboard = () => {
                       <h3 className="itemStyle">{dish.dishType}</h3>
                       <h3 className="itemStyle">Cuisine: {dish.dishCuisine}</h3>
                       <h3 className="itemStyle">Cost: {`${dish.dishCost}₹`}</h3>
-                      <button>Add</button>
+                      <button
+                        onClick={handleCartData}
+                        id={JSON.stringify(dish)}
+                      >
+                        Add
+                      </button>
                     </div>
                   );
                 })}
@@ -115,50 +200,8 @@ const Dashboard = () => {
     return resComponent;
   };
 
-  const sortByPrice = () => {
-    resData.forEach((res) => {
-      res.resDishes.sort(
-        (a, b) => parseFloat(a.dishCost) - parseFloat(b.dishCost)
-      );
-    });
-    setResData(resData);
-    setTestData([1]);
-    console.log("sorted", resData);
-  };
-
-  const handleNameFilter = (event) => {
-    // let fileredByName = []
-    if (event.target.checked) {
-      setFilterName([...filterName, event.target.id]);
-      //fileredByName.push(resData.filter(res => res.resName === event.target.id));
-    } else {
-      //fileredByName.pop(resData.filter(res => res.resName === event.target.id));
-    }
-  };
-  const handlePlaceFilter = (event) => {
-    console.log("cb event", event.target.id);
-  };
-  const handleCFilter = (event) => {
-    console.log("cb event", event.target.id);
-  };
-
-  const filterCloseHandler = () => {
-    setFilterVisible(false);
-  };
-  return (
-    <div className="userPage">
-      <h1>Welcome: {userName}</h1>
-      <div className="dataOptions">
-        <Button variant="outlined" onClick={sortByPrice}>
-          Sort-Price
-        </Button>
-        <Button variant="outlined" onClick={() => setFilterVisible(true)}>
-          Filter
-        </Button>
-        <Button variant="outlined" onClick={getResData}>
-          Reset
-        </Button>
-      </div>
+  const renderFilterUI = () => {
+    return (
       <Filter
         onClose={filterCloseHandler}
         show={filterVisible}
@@ -187,12 +230,66 @@ const Dashboard = () => {
                 label={cuisine}
               />
             ))}
-            {/* <Button variant="outlined">Apply Filter</Button> */}
+            <Button variant="outlined" onClick={handleFilter}>
+              Apply Filter
+            </Button>
           </div>
         )}
       </Filter>
+    );
+  };
+
+  const renderCartUI = () => {
+    return (
+      <Cart onClose={cartCloseHandler} show={cartVisible} title="My Cart">
+        <div>
+          <h4>
+            {cartData.map((cartItem, id) => {
+              return (
+                <div key={id}>
+                  <h3>{`${cartItem.dishName} - ${cartItem.dishCost}₹ `}</h3>
+                </div>
+              );
+            })}
+          </h4>
+          <h3>{`${cartData.length} Items Total : ${cartData.reduce(
+            (acc, item) => {
+              return acc + parseInt(item.dishCost);
+            },
+            0
+          )}`}</h3>
+          <Button variant="outlined">Order</Button>
+        </div>
+      </Cart>
+    );
+  };
+
+  const renderMenuButtons = () => {
+    return (
+      <div className="dataOptions">
+        <Button variant="outlined" onClick={sortByPrice}>
+          Sort-Price
+        </Button>
+        <Button variant="outlined" onClick={() => setFilterVisible(true)}>
+          Filter
+        </Button>
+        <Button variant="outlined" onClick={() => setCartVisible(true)}>
+          {`Cart Item ${cartData.length}`}
+        </Button>
+        <Button variant="outlined" onClick={getResData}>
+          Reset
+        </Button>
+      </div>
+    );
+  };
+
+  return (
+    <div className="userPage">
+      <h1>Welcome: {userName}</h1>
+      {renderMenuButtons()}
+      {renderFilterUI()}
+      {renderCartUI()}
       {renderResData()}
-      {/* <button onClick={populateUserData}>Populate</button> */}
     </div>
   );
 };
