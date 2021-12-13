@@ -5,6 +5,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { useNavigate } from "react-router-dom";
 import { update_auth } from "../Redux/Actions/UserAction";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 import Filter from "./Filter";
 import Cart from "./Cart";
 import "../ComponentStyles/UserHome.css";
@@ -276,6 +278,23 @@ const Dashboard = () => {
         <Button variant="outlined" onClick={() => setCartVisible(true)}>
           {`Cart Item ${cartData.length}`}
         </Button>
+        <Autocomplete
+          freeSolo
+          id="free-solo-2-demo"
+          disableClearable
+          options={resData.map((res) => res.resName)}
+          renderInput={(params) => (
+            <TextField
+              style={{ width: 400 }}
+              {...params}
+              label="Search Restaurant"
+              InputProps={{
+                ...params.InputProps,
+                type: "search",
+              }}
+            />
+          )}
+        />
         <Button variant="outlined" onClick={getResData}>
           Reset
         </Button>
